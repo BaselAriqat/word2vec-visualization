@@ -33,139 +33,34 @@ document.getElementById("submit").onclick = function () {
 }
 
 function createFlare (word, topn, data) {
-
-  /*flare = {
-    "name": "student",
-    "children": [
-      {"name": "graduate"},
-      {"name": "hosei"},
-      {"name": "daigaku"},
-      {"name": "college"},
-      {"name": "rikkyo"},
-      {"name": "graduated"},
-      {"name": "doctorate"},
-      {"name": "cambridge"},
-      {"name": "sophia"},
-      {"name": "doctoral"}
-    ]
-  };*/
-
-  topn = topn;
-
-  flare = "{";
-
   word = word;
-
   // Check whether word is in list?
   if (!(word in data)) {
     console.log("Word Not Found!");
     return 0;
   }
 
-  flare += "\"name\": \"" + word + "\",";
-  flare += "\"children\": [";
+  flare = new Object();
+
+  topn = topn;
+
+  flare.name = word;
+  flare.children = [];
 
   nearest_words = data[word];
 
   for (i = 0; i < topn; i++) {
-    flare += "{";
-
-    flare += "\"name\": \"" + nearest_words[i]["w"] + "\","; //Before loop 1
-
-    // Loop 1
-    flare += "\"children\": [";
-
-    nearest_words_1 = data[nearest_words[i]["w"]];
-
-    for (i1 = 0; i1 < topn; i1++) {
-      flare += "{";
-
-      flare += "\"name\": \"" + nearest_words_1[i1]["w"] + "\","; //Before loop 2
-
-      // Loop 2
-      flare += "\"children\": [";
-
-      nearest_words_2 = data[nearest_words_1[i1]["w"]];
-
-      for (i2 = 0; i2 < topn; i2++) {
-        flare += "{";
-
-        flare += "\"name\": \"" + nearest_words_2[i2]["w"] + "\","; //Before loop 3
-
-        // Loop 3
-        flare += "\"children\": [";
-
-        nearest_words_3 = data[nearest_words_2[i2]["w"]];
-
-        for (i3 = 0; i3 < topn; i3++) {
-          flare += "{";
-
-          flare += "\"name\": \"" + nearest_words_3[i3]["w"] + "\","; //Before loop 4
-
-          // Loop 4
-          flare += "\"children\": [";
-
-          nearest_words_4 = data[nearest_words_3[i3]["w"]];
-
-          for (i4 = 0; i4 < topn; i4++) {
-            flare += "{";
-
-            flare += "\"name\": \"" + nearest_words_4[i4]["w"] + "\""; //Before loop ?
-            // If this is the final layer --> modify (delete ",")
-            if (i4 != (topn - 1)) {
-              flare += "},";
-            }
-            else {
-              flare += "}";
-            }
-          }
-          flare += "]";
-          // End Loop 3
-
-          if (i3 != (topn - 1)) {
-            flare += "},";
-          }
-          else {
-            flare += "}";
-          }
-        }
-        flare += "]";
-        // End Loop 3
-
-        if (i2 != (topn - 1)) {
-          flare += "},";
-        }
-        else {
-          flare += "}";
-        }
-      }
-      flare += "]";
-      // End Loop 2
-
-      if (i1 != (topn - 1)) {
-        flare += "},";
-      }
-      else {
-        flare += "}";
-      }
-    }
-    flare += "]";
-    // End Loop 1
-
-    if (i != (topn - 1)) {
-      flare += "},";
-    }
-    else {
-      flare += "}";
-    }
-
+    sub_flare = new Object();
+    sub_flare.name = nearest_words[i]["w"];
+    flare.children.push(sub_flare);
   }
 
-  flare += "]";
-
-  flare += "}";
-
-  return JSON.parse(flare);
+  try {
+    JSON.parse(JSON.stringify(flare));
+  } catch(err) {
+    console.log(flare);
+  }
+  return JSON.parse(JSON.stringify(flare));
 }
 
 function visualize (word, topn) {
@@ -176,36 +71,36 @@ function visualize (word, topn) {
   if (document.getElementById("language").elements["language"].value == "English") {
     if (document.getElementById("metric").value == "Cosine") {
       if (document.getElementById("model").value == "Skipgram") {
-        data_file = "data/en_data_cosine_skipgram.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
       else {
-        data_file = "data/en_data_cosine_cbow.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
     }
     else {
       if (document.getElementById("model").value == "Skipgram") {
-        data_file = "data/en_data_euclidean_skipgram.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
       else {
-        data_file = "data/en_data_euclidean_cbow.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
     }
   }
   else {
     if (document.getElementById("metric").value == "Cosine") {
       if (document.getElementById("model").value == "Skipgram") {
-        data_file = "data/ja_data_cosine_skipgram.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
       else {
-        data_file = "data/ja_data_cosine_cbow.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
     }
     else {
       if (document.getElementById("model").value == "Skipgram") {
-        data_file = "data/ja_data_euclidean_skipgram.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
       else {
-        data_file = "data/ja_data_euclidean_cbow.json";
+        data_file = "data/custom_cosine_simialrity.json";
       }
     }
   }
@@ -333,6 +228,9 @@ function update (source) {
 
 // Toggle children on click.
 function click (d) {
+
+  d.children = createFlare(d.name).children;
+  console.log(d)
   if (d.children) {
     d._children = d.children;
     d.children = null;
